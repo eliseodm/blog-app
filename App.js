@@ -26,6 +26,7 @@ app.get("/", (req,res)=>{
     res.redirect("/blogs");
 });
 
+//Ruta INDEX
 app.get("/blogs", (req,res)=>{
     blog.find({},(err, blogs)=>{
         if(err){
@@ -34,6 +35,22 @@ app.get("/blogs", (req,res)=>{
             res.render("index", {blogs: blogs});
         }
     });
+});
+
+//Ruta nuevo Post
+
+app.post("/blogs", (req, res)=>{
+    blog.create(req.body.blog, (err, newBlog)=>{
+        if(err){
+            res.render("new");
+        } else {
+            res.redirect("/blogs");
+        }
+    });
+});
+
+app.get("/blogs/new", (req,res)=>{
+    res.render("new");
 });
 
 app.listen(3000, ()=>{
