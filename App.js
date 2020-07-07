@@ -1,6 +1,6 @@
-const { readSync } = require("fs");
-
+//const { readSync } = require("fs");
 const express = require("express"),
+methodOverride = require("method-override");
 bodyParser = require("body-parser"),
 moongoose = require("mongoose"),
 app = express();
@@ -10,6 +10,7 @@ moongoose.connect("mongodb://localhost/blog-app", {useNewUrlParser: true, useUni
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(methodOverride("_method"));
 
 //Mogoose - Configuracion de Modelo
 var blogSchema = new moongoose.Schema({
@@ -37,7 +38,7 @@ app.get("/blogs", (req,res)=>{
     });
 });
 
-//Ruta nuevo Post
+//Ruta nuevo Post (NEW)
 
 app.post("/blogs", (req, res)=>{
     blog.create(req.body.blog, (err, newBlog)=>{
@@ -53,7 +54,7 @@ app.get("/blogs/new", (req,res)=>{
     res.render("new");
 });
 
-//Ruta mostrar post
+//Ruta mostrar post (SHOW)
 
 app.get("/blogs/:id", (req,res)=>{
     blog.findById(req.params.id, (err, foundBlog)=>{
@@ -62,8 +63,46 @@ app.get("/blogs/:id", (req,res)=>{
         } else{
             res.render("show", {blog: foundBlog});
         }
-    })
+    });
 });
+
+//Ruta editar (EDIT)
+
+app.get("/blogs/:id/edit", (req, res)=>{
+    blog.findById(req.params.id, (err, foundBlog)=>{
+        if(err){
+            res.redirect("/blogs");
+        } else{
+            res.render("edit", {blog: foundBlog});
+        }
+    });
+});
+
+//Ruta actualizar (update)
+
+app.put("/blogs/:id", (req,res)=>{
+    blog.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedBlog)=>{
+        if(err){
+            res.redirect("/blogs");
+        } else{
+            res.redirect("/blogs/" + req.params.id);
+        }
+    });
+});
+
+// Eliminar ruta (DELETE)
+
+app.delete("/blogs/:id", (req,res)=>{
+    blog.findByIdAndRemove(req.params.id, (err)=>{
+        if(err){
+            res.redirect("/blogs");
+        } else{
+            res.redirect("/blogs");
+        }
+    });
+});
+
+//Puerto de escucha (server)
 
 app.listen(3000, ()=>{
     console.log("ServerUp!");
