@@ -10,6 +10,6 @@ i.icon {
     display: inline;
 }
 
-img {
-    width: 400px;
+.ui.violet.button {
+    padding: 1em;
 }
